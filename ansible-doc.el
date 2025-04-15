@@ -262,7 +262,11 @@ If NOCONFIRM is non-nil revert without prompt."
     (when (or noconfirm
               (y-or-n-p (format "Reload documentation for %s? " module)))
       (message "Loading documentation for module %s" module)
-      (let ((inhibit-read-only t))
+      (let ((inhibit-read-only t)
+            ;; Prevent ANSI color codes from being inserted into the buffer,
+            ;; which would otherwise display as raw escape sequences.
+            (process-environment (cons "ANSIBLE_NOCOLOR=1"
+                                       process-environment)))
         (erase-buffer)
         (call-process "ansible-doc" nil t t module)
         (let ((delete-trailing-lines t))
